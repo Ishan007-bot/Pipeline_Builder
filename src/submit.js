@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
+import { showToast } from './toast';
 
 const selector = (state) => ({
     nodes: state.nodes,
@@ -16,9 +17,13 @@ export const SubmitButton = () => {
     const [showModal, setShowModal] = useState(false);
 
     const handleSubmit = async () => {
-        if (nodes.length === 0) return;
+        if (nodes.length === 0) {
+            showToast('Pipeline is empty. Add some nodes first!', 'warning');
+            return;
+        }
 
         setIsLoading(true);
+        showToast('Analyzing pipeline...', 'info');
 
         const pipelineData = {
             nodes: nodes.map((node) => ({
@@ -52,6 +57,7 @@ export const SubmitButton = () => {
                 is_dag: data.is_dag,
                 source: 'server',
             });
+            showToast('Pipeline analysis complete!', 'success');
         } catch (error) {
             console.warn('Backend not available, performing client-side analysis:', error.message);
             setResult({
@@ -60,6 +66,7 @@ export const SubmitButton = () => {
                 is_dag: checkIfDAG(nodes, edges),
                 source: 'client',
             });
+            showToast('Analysis complete (client-side)', 'success');
         } finally {
             setIsLoading(false);
             setShowModal(true);

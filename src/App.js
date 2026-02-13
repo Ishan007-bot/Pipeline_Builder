@@ -3,6 +3,7 @@
 import { PipelineToolbar } from './toolbar';
 import { PipelineUI } from './ui';
 import { SubmitButton } from './submit';
+import { ToastContainer } from './toast';
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
 
       {/* Submit */}
       <SubmitButton />
+
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 // Displays the drag-and-drop UI
 // --------------------------------------------------
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import ReactFlow, { Controls, Background, MiniMap } from 'reactflow';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
@@ -40,6 +40,7 @@ const selector = (state) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
+  deleteSelectedNodes: state.deleteSelectedNodes,
 });
 
 export const PipelineUI = () => {
@@ -52,8 +53,23 @@ export const PipelineUI = () => {
     addNode,
     onNodesChange,
     onEdgesChange,
-    onConnect
+    onConnect,
+    deleteSelectedNodes,
   } = useStore(selector, shallow);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Delete key or Backspace to delete selected nodes
+      if ((event.key === 'Delete' || event.key === 'Backspace') && !event.target.closest('input, textarea, select')) {
+        event.preventDefault();
+        deleteSelectedNodes();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [deleteSelectedNodes]);
 
   const getInitNodeData = (nodeID, type) => {
     let nodeData = { id: nodeID, nodeType: `${type}` };
@@ -115,6 +131,7 @@ export const PipelineUI = () => {
         connectionLineType='smoothstep'
         fitView
         style={{ background: '#0a0e1a' }}
+        deleteKeyCode={null} // Disable default delete behavior (we handle it ourselves)
       >
         <Background color="#1e293b" gap={gridSize} size={1} />
         <Controls />
