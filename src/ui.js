@@ -99,27 +99,44 @@ export const PipelineUI = () => {
   }, []);
 
   return (
-    <>
-      <div ref={reactFlowWrapper} style={{ width: '100vw', height: '70vh' }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onInit={setReactFlowInstance}
-          nodeTypes={nodeTypes}
-          proOptions={proOptions}
-          snapGrid={[gridSize, gridSize]}
-          connectionLineType='smoothstep'
-        >
-          <Background color="#aaa" gap={gridSize} />
-          <Controls />
-          <MiniMap />
-        </ReactFlow>
-      </div>
-    </>
+    <div ref={reactFlowWrapper} className="pipeline-canvas-wrapper">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onInit={setReactFlowInstance}
+        nodeTypes={nodeTypes}
+        proOptions={proOptions}
+        snapGrid={[gridSize, gridSize]}
+        connectionLineType='smoothstep'
+        fitView
+        style={{ background: '#0a0e1a' }}
+      >
+        <Background color="#1e293b" gap={gridSize} size={1} />
+        <Controls />
+        <MiniMap
+          nodeColor={(node) => {
+            const colors = {
+              customInput: '#10b981',
+              customOutput: '#3b82f6',
+              llm: '#8b5cf6',
+              text: '#f59e0b',
+              filter: '#f43f5e',
+              merge: '#06b6d4',
+              api: '#6366f1',
+              condition: '#f97316',
+              timer: '#ec4899',
+            };
+            return colors[node.type] || '#64748b';
+          }}
+          maskColor="rgba(10, 14, 26, 0.8)"
+          style={{ background: '#111827' }}
+        />
+      </ReactFlow>
+    </div>
   )
 }

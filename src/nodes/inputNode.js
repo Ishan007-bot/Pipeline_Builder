@@ -20,32 +20,32 @@ export const InputNode = ({ id, data }) => {
   };
 
   return (
-    <div style={{ width: 200, height: 80, border: '1px solid black' }}>
-      <div>
-        <span>Input</span>
+    <div className="pipeline-node node-accent-input">
+      <div className="node-header">
+        <div className="node-icon">📥</div>
+        <span className="node-title">Input</span>
+        <span className="node-subtitle">{id}</span>
       </div>
-      <div>
-        <label>
-          Name:
+      <div className="node-body">
+        <div className="node-field">
+          <label className="node-field-label">Name</label>
           <input
             type="text"
+            className="node-field-input nodrag"
             value={currName}
             onChange={handleNameChange}
+            placeholder="Enter input name..."
           />
-        </label>
-        <label>
-          Type:
-          <select value={inputType} onChange={handleTypeChange}>
+        </div>
+        <div className="node-field">
+          <label className="node-field-label">Type</label>
+          <select className="node-field-select nodrag" value={inputType} onChange={handleTypeChange}>
             <option value="Text">Text</option>
             <option value="File">File</option>
           </select>
-        </label>
+        </div>
       </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id={`${id}-value`}
-      />
+      <Handle type="source" position={Position.Right} id={`${id}-value`} />
     </div>
   );
 }

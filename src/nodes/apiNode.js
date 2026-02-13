@@ -1,5 +1,4 @@
 // apiNode.js
-// API Node: Makes HTTP requests to external APIs
 
 import { useState } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -26,49 +25,67 @@ export const APINode = ({ id, data }) => {
         updateNodeField(id, 'headers', e.target.value);
     };
 
+    const methodColors = {
+        GET: '#10b981',
+        POST: '#3b82f6',
+        PUT: '#f59e0b',
+        DELETE: '#f43f5e',
+        PATCH: '#8b5cf6',
+    };
+
     return (
-        <div style={{ width: 230, minHeight: 110, border: '1px solid black', padding: '8px', borderRadius: '4px', background: '#fff' }}>
+        <div className="pipeline-node node-accent-api">
             <Handle type="target" position={Position.Left} id={`${id}-body`} style={{ top: '30%' }} />
             <Handle type="target" position={Position.Left} id={`${id}-params`} style={{ top: '70%' }} />
 
-            <div>
-                <span style={{ fontWeight: 'bold', fontSize: '12px' }}>API Call</span>
+            <div className="node-header">
+                <div className="node-icon">🌐</div>
+                <span className="node-title">API Call</span>
+                <span style={{
+                    fontSize: '10px',
+                    padding: '1px 8px',
+                    borderRadius: '4px',
+                    fontWeight: 700,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    background: `${methodColors[method]}20`,
+                    color: methodColors[method],
+                    marginLeft: 'auto',
+                }}>
+                    {method}
+                </span>
             </div>
 
-            <div style={{ marginTop: '6px' }}>
-                <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                    Method:
-                    <select value={method} onChange={handleMethodChange} className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px', marginTop: '2px' }}>
+            <div className="node-body">
+                <div className="node-field">
+                    <label className="node-field-label">Method</label>
+                    <select className="node-field-select nodrag" value={method} onChange={handleMethodChange}>
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
                         <option value="PUT">PUT</option>
                         <option value="DELETE">DELETE</option>
                         <option value="PATCH">PATCH</option>
                     </select>
-                </label>
-                <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                    URL:
+                </div>
+                <div className="node-field">
+                    <label className="node-field-label">URL</label>
                     <input
                         type="text"
+                        className="node-field-input nodrag"
                         value={url}
                         onChange={handleUrlChange}
                         placeholder="https://api.example.com/data"
-                        className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px 4px', boxSizing: 'border-box', marginTop: '2px' }}
                     />
-                </label>
-                <label style={{ fontSize: '11px', display: 'block' }}>
-                    Headers (JSON):
+                </div>
+                <div className="node-field">
+                    <label className="node-field-label">Headers (JSON)</label>
                     <input
                         type="text"
+                        className="node-field-input nodrag"
                         value={headers}
                         onChange={handleHeadersChange}
                         placeholder='{"Authorization": "Bearer ..."}'
-                        className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px 4px', boxSizing: 'border-box', marginTop: '2px' }}
                     />
-                </label>
+                </div>
             </div>
 
             <Handle type="source" position={Position.Right} id={`${id}-response`} style={{ top: '30%' }} />

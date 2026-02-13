@@ -1,5 +1,4 @@
 // mergeNode.js
-// Merge node: Combines multiple inputs into a single output
 
 import { useState } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -21,36 +20,37 @@ export const MergeNode = ({ id, data }) => {
     };
 
     return (
-        <div style={{ width: 200, minHeight: 90, border: '1px solid black', padding: '8px', borderRadius: '4px', background: '#fff' }}>
+        <div className="pipeline-node node-accent-merge">
             <Handle type="target" position={Position.Left} id={`${id}-input1`} style={{ top: '30%' }} />
-            <Handle type="target" position={Position.Left} id={`${id}-input2`} style={{ top: '60%' }} />
+            <Handle type="target" position={Position.Left} id={`${id}-input2`} style={{ top: '65%' }} />
 
-            <div>
-                <span style={{ fontWeight: 'bold', fontSize: '12px' }}>Merge</span>
+            <div className="node-header">
+                <div className="node-icon">🔗</div>
+                <span className="node-title">Merge</span>
+                <span className="node-subtitle">{id}</span>
             </div>
 
-            <div style={{ marginTop: '6px' }}>
-                <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                    Strategy:
-                    <select value={mergeStrategy} onChange={handleStrategyChange} className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px', marginTop: '2px' }}>
+            <div className="node-body">
+                <div className="node-field">
+                    <label className="node-field-label">Strategy</label>
+                    <select className="node-field-select nodrag" value={mergeStrategy} onChange={handleStrategyChange}>
                         <option value="concatenate">Concatenate</option>
                         <option value="merge_json">Merge JSON</option>
                         <option value="array">Combine as Array</option>
                         <option value="override">Override (Last Wins)</option>
                     </select>
-                </label>
+                </div>
                 {mergeStrategy === 'concatenate' && (
-                    <label style={{ fontSize: '11px', display: 'block' }}>
-                        Separator:
+                    <div className="node-field">
+                        <label className="node-field-label">Separator</label>
                         <input
                             type="text"
+                            className="node-field-input nodrag"
                             value={separator}
                             onChange={handleSeparatorChange}
-                            className="nodrag"
-                            style={{ width: '100%', fontSize: '11px', padding: '2px 4px', boxSizing: 'border-box', marginTop: '2px' }}
+                            placeholder="e.g. \\n or ,"
                         />
-                    </label>
+                    </div>
                 )}
             </div>
 

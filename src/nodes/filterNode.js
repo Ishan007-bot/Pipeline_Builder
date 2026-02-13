@@ -1,5 +1,4 @@
 // filterNode.js
-// Filter/Transform node: Applies conditions to filter or transform data
 
 import { useState } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -27,29 +26,29 @@ export const FilterNode = ({ id, data }) => {
     };
 
     return (
-        <div style={{ width: 220, minHeight: 100, border: '1px solid black', padding: '8px', borderRadius: '4px', background: '#fff' }}>
+        <div className="pipeline-node node-accent-filter">
             <Handle type="target" position={Position.Left} id={`${id}-input`} />
 
-            <div>
-                <span style={{ fontWeight: 'bold', fontSize: '12px' }}>Filter</span>
+            <div className="node-header">
+                <div className="node-icon">🔍</div>
+                <span className="node-title">Filter</span>
+                <span className="node-subtitle">{id}</span>
             </div>
 
-            <div style={{ marginTop: '6px' }}>
-                <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                    Field:
+            <div className="node-body">
+                <div className="node-field">
+                    <label className="node-field-label">Field</label>
                     <input
                         type="text"
+                        className="node-field-input nodrag"
                         value={field}
                         onChange={handleFieldChange}
                         placeholder="e.g. status"
-                        className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px 4px', boxSizing: 'border-box', marginTop: '2px' }}
                     />
-                </label>
-                <label style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
-                    Condition:
-                    <select value={condition} onChange={handleConditionChange} className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px', marginTop: '2px' }}>
+                </div>
+                <div className="node-field">
+                    <label className="node-field-label">Condition</label>
+                    <select className="node-field-select nodrag" value={condition} onChange={handleConditionChange}>
                         <option value="contains">Contains</option>
                         <option value="equals">Equals</option>
                         <option value="not_equals">Not Equals</option>
@@ -57,22 +56,21 @@ export const FilterNode = ({ id, data }) => {
                         <option value="less_than">Less Than</option>
                         <option value="regex">Regex Match</option>
                     </select>
-                </label>
-                <label style={{ fontSize: '11px', display: 'block' }}>
-                    Value:
+                </div>
+                <div className="node-field">
+                    <label className="node-field-label">Value</label>
                     <input
                         type="text"
+                        className="node-field-input nodrag"
                         value={value}
                         onChange={handleValueChange}
                         placeholder="e.g. active"
-                        className="nodrag"
-                        style={{ width: '100%', fontSize: '11px', padding: '2px 4px', boxSizing: 'border-box', marginTop: '2px' }}
                     />
-                </label>
+                </div>
             </div>
 
             <Handle type="source" position={Position.Right} id={`${id}-true`} style={{ top: '40%' }} />
-            <Handle type="source" position={Position.Right} id={`${id}-false`} style={{ top: '70%' }} />
+            <Handle type="source" position={Position.Right} id={`${id}-false`} style={{ top: '75%' }} />
         </div>
     );
 };

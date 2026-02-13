@@ -1,5 +1,6 @@
 // submit.js
 
+import { useState } from 'react';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
 
@@ -10,9 +11,15 @@ const selector = (state) => ({
 
 export const SubmitButton = () => {
     const { nodes, edges } = useStore(selector, shallow);
+    const [isLoading, setIsLoading] = useState(false);
+    const [result, setResult] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     const handleSubmit = async () => {
-        // Build the pipeline data
+        if (nodes.length === 0) return;
+
+        setIsLoading(true);
+
         const pipelineData = {
             nodes: nodes.map((node) => ({
                 id: node.id,
@@ -32,56 +39,44 @@ export const SubmitButton = () => {
         try {
             const response = await fetch('http://localhost:8000/pipelines/parse', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(pipelineData),
             });
 
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
-            const result = await response.json();
-
-            // Display the result
-            alert(
-                `Pipeline Analysis:\n\n` +
-                `• Number of Nodes: ${result.num_nodes}\n` +
-                `• Number of Edges: ${result.num_edges}\n` +
-                `• Is a DAG: ${result.is_dag ? 'Yes ✓' : 'No ✗'}`
-            );
+            const data = await response.json();
+            setResult({
+                num_nodes: data.num_nodes,
+                num_edges: data.num_edges,
+                is_dag: data.is_dag,
+                source: 'server',
+            });
         } catch (error) {
-            // If backend is not running, do client-side analysis
             console.warn('Backend not available, performing client-side analysis:', error.message);
-
-            const numNodes = nodes.length;
-            const numEdges = edges.length;
-            const isDAG = checkIfDAG(nodes, edges);
-
-            alert(
-                `Pipeline Analysis (Client-Side):\n\n` +
-                `• Number of Nodes: ${numNodes}\n` +
-                `• Number of Edges: ${numEdges}\n` +
-                `• Is a DAG: ${isDAG ? 'Yes ✓' : 'No ✗'}`
-            );
+            setResult({
+                num_nodes: nodes.length,
+                num_edges: edges.length,
+                is_dag: checkIfDAG(nodes, edges),
+                source: 'client',
+            });
+        } finally {
+            setIsLoading(false);
+            setShowModal(true);
         }
     };
 
-    // Client-side DAG check using topological sort (Kahn's Algorithm)
     const checkIfDAG = (nodes, edges) => {
         if (nodes.length === 0) return true;
 
         const adjList = {};
         const inDegree = {};
 
-        // Initialize
         nodes.forEach((node) => {
             adjList[node.id] = [];
             inDegree[node.id] = 0;
         });
 
-        // Build adjacency list and compute in-degrees
         edges.forEach((edge) => {
             if (adjList[edge.source]) {
                 adjList[edge.source].push(edge.target);
@@ -91,25 +86,19 @@ export const SubmitButton = () => {
             }
         });
 
-        // Kahn's algorithm
         const queue = [];
         Object.keys(inDegree).forEach((nodeId) => {
-            if (inDegree[nodeId] === 0) {
-                queue.push(nodeId);
-            }
+            if (inDegree[nodeId] === 0) queue.push(nodeId);
         });
 
         let visited = 0;
         while (queue.length > 0) {
             const current = queue.shift();
             visited++;
-
             if (adjList[current]) {
                 adjList[current].forEach((neighbor) => {
                     inDegree[neighbor] -= 1;
-                    if (inDegree[neighbor] === 0) {
-                        queue.push(neighbor);
-                    }
+                    if (inDegree[neighbor] === 0) queue.push(neighbor);
                 });
             }
         }
@@ -118,8 +107,77 @@ export const SubmitButton = () => {
     };
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <button type="submit" onClick={handleSubmit}>Submit</button>
-        </div>
+        <>
+            <div className="submit-section">
+                <div className="pipeline-stats">
+                    <div className="stat-item">
+                        <span>Nodes</span>
+                        <span className="stat-value">{nodes.length}</span>
+                    </div>
+                    <div className="stat-item">
+                        <span>Edges</span>
+                        <span className="stat-value">{edges.length}</span>
+                    </div>
+                </div>
+
+                <button
+                    className="submit-btn"
+                    onClick={handleSubmit}
+                    disabled={isLoading || nodes.length === 0}
+                >
+                    {isLoading ? (
+                        <>
+                            <span className="loading-spinner" />
+                            Analyzing...
+                        </>
+                    ) : (
+                        <>
+                            <span className="submit-btn-icon">▶</span>
+                            Run Pipeline
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {/* Result Modal */}
+            {showModal && result && (
+                <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className={`modal-icon ${result.is_dag ? 'success' : 'error'}`}>
+                                {result.is_dag ? '✅' : '⚠️'}
+                            </div>
+                            <div>
+                                <div className="modal-title">Pipeline Analysis</div>
+                                <div className="modal-subtitle">
+                                    {result.source === 'server' ? 'Server-side validation' : 'Client-side validation'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-stats">
+                            <div className="modal-stat">
+                                <span className="modal-stat-label">🔲 Total Nodes</span>
+                                <span className="modal-stat-value">{result.num_nodes}</span>
+                            </div>
+                            <div className="modal-stat">
+                                <span className="modal-stat-label">🔗 Total Edges</span>
+                                <span className="modal-stat-value">{result.num_edges}</span>
+                            </div>
+                            <div className="modal-stat">
+                                <span className="modal-stat-label">🔄 Valid DAG</span>
+                                <span className={`modal-stat-value ${result.is_dag ? 'dag-yes' : 'dag-no'}`}>
+                                    {result.is_dag ? 'Yes ✓' : 'No ✗'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <button className="modal-close-btn" onClick={() => setShowModal(false)}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
