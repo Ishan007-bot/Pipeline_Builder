@@ -1,70 +1,131 @@
-# Getting Started with Create React App
+# ⚡ Pipeline Builder Pro
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A **professional-grade visual workflow/pipeline builder** built with React and React Flow. Drag-and-drop nodes, connect them with animated edges, and validate your pipeline as a DAG — all in a stunning dark glassmorphism UI.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+### 🔲 9 Node Types
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Node | Description | Inputs | Outputs |
+|------|-------------|--------|---------|
+| **📥 Input** | Data entry point | — | 1 (value) |
+| **📤 Output** | Data exit point | 1 (value) | — |
+| **🧠 LLM** | Large Language Model | 2 (system, prompt) | 1 (response) |
+| **📝 Text** | Dynamic text template | Dynamic (from `{{variables}}`) | 1 (output) |
+| **🔍 Filter** | Conditional filtering | 1 (input) | 2 (true, false) |
+| **🔗 Merge** | Combine multiple inputs | 2 (input1, input2) | 1 (output) |
+| **🌐 API Call** | HTTP request node | 2 (body, params) | 2 (response, error) |
+| **🔀 Condition** | If/Else branching | 1 (input) | 2 (true, false) |
+| **⏱️ Timer** | Delay/debounce/throttle | 1 (input) | 1 (output) |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 📝 Dynamic Text Node
+The **Text node** automatically detects `{{variable}}` patterns and generates input handles for each unique variable in real-time:
+- `{{name}}` → creates a "name" input handle
+- `Hello {{firstName}} {{lastName}}` → creates two handles: "firstName", "lastName"
+- Duplicate variables are deduplicated
 
-### `npm test`
+### 🚀 Pipeline Submission & DAG Validation
+- Sends pipeline data to `POST http://localhost:8000/pipelines/parse`
+- Falls back to **client-side DAG validation** (Kahn's Topological Sort) if backend is unavailable
+- Displays results in an animated modal: node count, edge count, and DAG validity
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔒 Connection Validation
+- Prevents **self-loop** connections
+- Prevents **duplicate** edges
+- Shows toast notifications for invalid connections
 
-### `npm run build`
+### ⌨️ Keyboard Shortcuts
+| Key | Action |
+|-----|--------|
+| `Delete` / `Backspace` | Delete selected nodes (smart — disabled while typing in inputs) |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🔔 Toast Notifications
+- 4 types: success, error, warning, info
+- Auto-dismiss after 3 seconds
+- Slide-in animation from the right
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎨 Design
 
-### `npm run eject`
+- **Dark glassmorphism** theme with `backdrop-filter: blur()`
+- **Google Fonts**: Inter (UI) + JetBrains Mono (code/labels)
+- **9 unique accent colors** — one per node type, applied to headers, icons, and handles
+- **Animated edges** with smooth-step connections
+- **Color-coded MiniMap** for pipeline overview
+- **Micro-animations**: hover effects, modal slide-up, toast slide-in, loading spinner
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠️ Tech Stack
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Technology | Purpose |
+|-----------|---------|
+| **React 18** | UI framework |
+| **React Flow** (v11.8) | Visual node editor |
+| **Zustand** (v4.4) | State management |
+| **CSS Custom Properties** | Design system tokens |
+| **Kahn's Algorithm** | Client-side DAG validation |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🚀 Getting Started
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Prerequisites
+- **Node.js** (v16 or higher)
+- **npm** (v8 or higher)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Installation
 
-### Code Splitting
+```bash
+# Clone the repository
+git clone https://github.com/Ishan007-bot/Pipeline_Builder.git
+cd Pipeline_Builder
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+# Install dependencies
+npm install
 
-### Analyzing the Bundle Size
+# Start the development server
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The app will open at [http://localhost:3000](http://localhost:3000).
 
-### Making a Progressive Web App
+### Backend (Optional)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The submit button sends data to `http://localhost:8000/pipelines/parse`. If the backend is not running, the app falls back to client-side DAG validation.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 📁 Project Structure
 
-### Deployment
+```
+src/
+├── App.js              # Root component with header layout
+├── index.js            # React entry point
+├── index.css           # Complete design system (1000+ lines)
+├── store.js            # Zustand store with validation logic
+├── ui.js               # React Flow canvas with keyboard shortcuts
+├── toolbar.js          # Categorized node palette (I/O, AI, Logic, Integration)
+├── submit.js           # Submit button with modal results
+├── draggableNode.js    # Reusable draggable toolbar item
+├── toast.js            # Global toast notification system
+└── nodes/
+    ├── inputNode.js    # Input node
+    ├── outputNode.js   # Output node
+    ├── llmNode.js      # LLM node
+    ├── textNode.js     # Dynamic text node with {{variable}} parsing
+    ├── filterNode.js   # Filter/condition node
+    ├── mergeNode.js    # Merge/combine node
+    ├── apiNode.js      # API call node
+    ├── conditionNode.js # If/Else branching node
+    └── timerNode.js    # Timer/delay node
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 📄 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is private and part of an assessment.
